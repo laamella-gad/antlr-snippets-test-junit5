@@ -1,6 +1,7 @@
 package antlr_grammar_snippet_test;
 
 import com.laamella.snippets_test_junit5.ActualGenerator;
+import com.laamella.snippets_test_junit5.BasePath;
 import com.laamella.snippets_test_junit5.SnippetTestFactory;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -28,13 +29,13 @@ public class AntlrGrammarTestFactory<L extends Lexer, P extends Parser> {
     private final Function<CharStream, L> lexerFactory;
     private final Function<CommonTokenStream, P> parserFactory;
     private final ActualGenerator<GrammarTestCase<L, P>>[] actualGenerators;
-    private final Path basePath;
+    private final BasePath basePath;
     private final Predicate<Path> testcaseFilenameFilter;
 
     /**
      * @param lexerFactory           creates a new lexer for your grammar
      * @param parserFactory          creates a new parser for your grammar
-     * @param basePath               sets the base path. Base path + testCasesDirectory = where the test case snippets are located. Subdirectories are included. {@link com.laamella.snippets_test_junit5.BasePathBuilder} will help in setting up this path.
+     * @param basePath               sets the base path. Base path + testCasesDirectory = where the test case snippets are located. Subdirectories are included.
      * @param testcaseFilenameFilter when only snippets are in the indicated directory, "path -> true"  is enough. Otherwise use something like "path -> path.toString().endsWith(".java")"
      * @param actualGenerators       the printers that create an "actual" to test against. {@link ParseTreePrettyPrinter} and {@link ErrorsPrinter} are recommended.
      */
@@ -42,7 +43,7 @@ public class AntlrGrammarTestFactory<L extends Lexer, P extends Parser> {
     public AntlrGrammarTestFactory(
             Function<CharStream, L> lexerFactory,
             Function<CommonTokenStream, P> parserFactory,
-            Path basePath,
+            BasePath basePath,
             Predicate<Path> testcaseFilenameFilter,
             ActualGenerator<GrammarTestCase<L, P>>... actualGenerators) {
         this.lexerFactory = requireNonNull(lexerFactory);
@@ -101,7 +102,6 @@ public class AntlrGrammarTestFactory<L extends Lexer, P extends Parser> {
         recognizer.addErrorListener(new BaseErrorListener() {
             @Override
             public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
-
                 errors.add("line: " + line + ", " +
                         "offset: " + charPositionInLine + ", " +
                         (offendingSymbol != null ? "symbol:" + offendingSymbol + " " : "") +
