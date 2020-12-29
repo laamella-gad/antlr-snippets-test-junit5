@@ -1,4 +1,4 @@
-package antlr_grammar_snippet_test;
+package com.laamella.antlr_grammar_snippet_test;
 
 import com.laamella.snippets_test_junit5.ActualGenerator;
 import org.antlr.v4.runtime.CommonToken;

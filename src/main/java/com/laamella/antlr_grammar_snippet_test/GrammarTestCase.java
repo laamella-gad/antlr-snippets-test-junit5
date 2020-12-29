@@ -1,4 +1,4 @@
-package antlr_grammar_snippet_test;
+package com.laamella.antlr_grammar_snippet_test;
 
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
