@@ -1,8 +1,6 @@
 package com.laamella.antlr_grammar_snippet_test;
 
-import com.laamella.snippets_test_junit5.ActualGenerator;
-import com.laamella.snippets_test_junit5.BasePath;
-import com.laamella.snippets_test_junit5.SnippetTestFactory;
+import com.laamella.snippets_test_junit5.*;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.jupiter.api.DynamicTest;
@@ -25,13 +23,7 @@ import static org.antlr.v4.runtime.atn.PredictionMode.LL_EXACT_AMBIG_DETECTION;
  * @param <L> the lexer you want to test
  * @param <P> the parser you want to test.
  */
-public class AntlrGrammarTestFactory<L extends Lexer, P extends Parser> {
-    private final Function<CharStream, L> lexerFactory;
-    private final Function<CommonTokenStream, P> parserFactory;
-    private final ActualGenerator<GrammarTestCase<L, P>>[] actualGenerators;
-    private final BasePath basePath;
-    private final Predicate<Path> testcaseFilenameFilter;
-
+public class AntlrGrammarTestFactory<L extends Lexer, P extends Parser> extends SnippetTestFactory<GrammarTestCase<L, P>> {
     /**
      * @param lexerFactory           creates a new lexer for your grammar
      * @param parserFactory          creates a new parser for your grammar
@@ -45,44 +37,21 @@ public class AntlrGrammarTestFactory<L extends Lexer, P extends Parser> {
             Function<CommonTokenStream, P> parserFactory,
             BasePath basePath,
             Predicate<Path> testcaseFilenameFilter,
+            Function<P, ParseTree> mainRuleInvoker,
             ActualGenerator<GrammarTestCase<L, P>>... actualGenerators) {
-        this.lexerFactory = requireNonNull(lexerFactory);
-        this.parserFactory = requireNonNull(parserFactory);
-        this.basePath = requireNonNull(basePath);
-        this.testcaseFilenameFilter = requireNonNull(testcaseFilenameFilter);
-        this.actualGenerators = requireNonNull(actualGenerators);
-    }
-
-    public Stream<DynamicTest> stream(String testCasesDirectory, Function<P, ParseTree> mainRuleInvoker) throws IOException {
-        return stream(testCasesDirectory, mainRuleInvoker, false);
-    }
-
-    public Stream<DynamicTest> regenerate(String testCasesDirectory, Function<P, ParseTree> mainRuleInvoker) throws IOException {
-        return stream(testCasesDirectory, mainRuleInvoker, true);
-    }
-
-    /**
-     * @param testCasesDirectory where to look for snippet files (basepath +  testCasesDirectory)
-     * @param mainRuleInvoker    should invoke the correct grammar rule for the test case.
-     * @return a stream of testcases to return from a JUnit5 @{@link org.junit.jupiter.api.TestFactory}
-     */
-    public Stream<DynamicTest> stream(String testCasesDirectory, Function<P, ParseTree> mainRuleInvoker, boolean regenerate) throws IOException {
-        requireNonNull(testCasesDirectory);
-        requireNonNull(mainRuleInvoker);
-        return new SnippetTestFactory<>(
+        super(
+                new SnippetFileFormat("/*", "*/\n", "\n/* expected:\n", "\n---\n", "*/"),
                 basePath,
                 testcaseFilenameFilter,
-                testCaseText -> preprocess(testCaseText, mainRuleInvoker),
-                "/*",
-                "*/\n",
-                "\n/* expected:\n",
-                "\n---\n",
-                "*/",
-                actualGenerators)
-                .stream(testCasesDirectory, regenerate);
+                testCaseText -> preprocess(testCaseText, mainRuleInvoker, lexerFactory, parserFactory),
+                actualGenerators);
     }
 
-    private GrammarTestCase<L, P> preprocess(String testCaseText, Function<P, ParseTree> mainRuleInvoker) {
+    private static <L extends Lexer, P extends Parser> GrammarTestCase<L, P> preprocess(
+            String testCaseText,
+            Function<P, ParseTree> mainRuleInvoker,
+            Function<CharStream, L> lexerFactory,
+            Function<CommonTokenStream, P> parserFactory) {
         List<String> errors = new ArrayList<>();
         L lexer = lexerFactory.apply(CharStreams.fromString(testCaseText));
         collectErrorAndWarningMessagesInList(lexer, errors);
@@ -96,7 +65,7 @@ public class AntlrGrammarTestFactory<L extends Lexer, P extends Parser> {
         return new GrammarTestCase<>(lexer, parser, tokenList, tree, errors);
     }
 
-    private void collectErrorAndWarningMessagesInList(Recognizer<?, ?> recognizer, List<String> errors) {
+    private static void collectErrorAndWarningMessagesInList(Recognizer<?, ?> recognizer, List<String> errors) {
         recognizer.removeErrorListeners();
         recognizer.addErrorListener(new DiagnosticErrorListener(true));
         recognizer.addErrorListener(new BaseErrorListener() {
