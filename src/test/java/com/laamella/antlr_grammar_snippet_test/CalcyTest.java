@@ -9,7 +9,7 @@ import org.junit.jupiter.api.TestFactory;
 import java.io.IOException;
 import java.util.stream.Stream;
 
-import static com.laamella.snippets_test_junit5.TestCaseFilenameFilter.filesWithExtension;
+import static com.laamella.snippets_test_junit5.snippet.TestCaseFilenameFilter.filesWithExtension;
 
 public class CalcyTest {
 

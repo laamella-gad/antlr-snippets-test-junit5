@@ -1,6 +1,6 @@
 package com.laamella.antlr_grammar_snippet_test;
 
-import com.laamella.snippets_test_junit5.ActualGenerator;
+import com.laamella.snippets_test_junit5.snippet.ActualGenerator;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
 

@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * Information about the parsing process for one snippet test case,
- * that can be used by {@link com.laamella.snippets_test_junit5.ActualGenerator}s to produce their output.
+ * that can be used by {@link com.laamella.snippets_test_junit5.snippet.ActualGenerator}s to produce their output.
  */
 public class GrammarTestCase<L extends Lexer, P extends Parser> {
     private final L lexer;
